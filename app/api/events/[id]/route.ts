@@ -1,7 +1,7 @@
 import { db } from "@/config/db";
 import { eventsTable } from "@/db/schema";
 import { parseId } from "@/utils/parse-id";
-import { updateEventSchema } from "@/validators/create-event.validator";
+import { updateEventSchema } from "@/validators/event.validator";
 import { eq } from "drizzle-orm";
 import { NextRequest, NextResponse } from "next/server";
 

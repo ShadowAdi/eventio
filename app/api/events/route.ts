@@ -1,6 +1,6 @@
 import { db } from "@/config/db";
 import { eventsTable } from "@/db/schema";
-import { createEventSchema } from "@/validators/create-event.validator";
+import { createEventSchema } from "@/validators/event.validator";
 import { NextRequest, NextResponse } from "next/server";
 
 export async function GET() {

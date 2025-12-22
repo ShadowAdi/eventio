@@ -1,5 +1,7 @@
 import { db } from "@/config/db";
 import { eventsTable } from "@/db/schema";
+import { parseId } from "@/utils/parse-id";
+import { updateEventSchema } from "@/validators/create-event.validator";
 import { eq } from "drizzle-orm";
 import { NextRequest, NextResponse } from "next/server";
 
@@ -7,45 +9,59 @@ export async function GET(
     req: NextRequest,
     { params }: { params: Promise<{ id: string }> }
 ) {
-    const { id: idParam } = await params;
-    const id = Number(idParam);
+    try {
+        const { id: idParam } = await params;
 
-    if (isNaN(id)) {
-        return NextResponse.json({ error: "Invalid ID" }, { status: 400 });
+        const id = parseId(idParam);
+        if (!id) {
+            return NextResponse.json({ error: "Invalid ID" }, { status: 400 });
+        }
+
+        const current = await db.select().from(eventsTable).where(eq(eventsTable.id, id)).limit(1);
+        const existingEvent = current[0];
+
+        if (!existingEvent) {
+            return NextResponse.json({ error: "Event not found" }, { status: 404 });
+        }
+
+        return NextResponse.json({ event: existingEvent, success: true }, { status: 200 });
+    } catch (error) {
+        console.error("Error fetching event:", error);
+        return NextResponse.json(
+            { success: false, message: "Internal Server Error", error },
+            { status: 500 }
+        );
     }
-
-    const current = await db.select().from(eventsTable).where(eq(eventsTable.id, id)).limit(1);
-    const existingEvent = current[0];
-
-    if (!existingEvent) {
-        return NextResponse.json({ error: "Event not found" }, { status: 404 });
-    }
-
-    return NextResponse.json({ event: existingEvent, success: true }, { status: 200 });
 }
 
 export async function DELETE(
     req: NextRequest,
     { params }: { params: Promise<{ id: string }> }
 ) {
-    const { id: idParam } = await params;
-    const id = Number(idParam);
+    try {
+        const { id: idParam } = await params;
+        const id = parseId(idParam);
+        if (!id) {
+            return NextResponse.json({ error: "Invalid ID" }, { status: 400 });
+        }
 
-    if (isNaN(id)) {
-        return NextResponse.json({ error: "Invalid ID" }, { status: 400 });
+        const current = await db.select().from(eventsTable).where(eq(eventsTable.id, id)).limit(1);
+        const existingEvent = current[0];
+
+        if (!existingEvent) {
+            return NextResponse.json({ error: "Event not found" }, { status: 404 });
+        }
+        await db.delete(eventsTable).where(eq(eventsTable.id, id));
+
+        return NextResponse.json({ message: "Event deleted!", success: true }, { status: 200 });
+    } catch (error) {
+        console.error("Error deleting event:", error);
+        return NextResponse.json(
+            { success: false, message: "Internal Server Error", error },
+            { status: 500 }
+        );
     }
-
-    const current = await db.select().from(eventsTable).where(eq(eventsTable.id, id)).limit(1);
-    const existingEvent = current[0];
-
-    if (!existingEvent) {
-        return NextResponse.json({ error: "Event not found" }, { status: 404 });
-    }
-    await db.delete(eventsTable).where(eq(eventsTable.id, id));
-
-    return NextResponse.json({ message: "Event deleted!", success: true }, { status: 200 });
 }
-
 
 export async function PATCH(
     req: NextRequest,
@@ -53,38 +69,43 @@ export async function PATCH(
 ) {
     try {
         const { id: idParam } = await params;
-        const id = Number(idParam);
-
-        if (isNaN(id)) {
+        const id = parseId(idParam);
+        if (!id) {
             return NextResponse.json({ error: "Invalid ID" }, { status: 400 });
         }
 
         const body = await req.json();
 
-        const updateData: Partial<typeof eventsTable.$inferInsert> = {};
+        const parsed = updateEventSchema.safeParse(body);
 
-        if (body.title !== undefined) updateData.title = body.title;
-        if (body.description !== undefined) updateData.description = body.description;
-        if (body.location !== undefined) updateData.location = body.location;
-        if (body.isOnline !== undefined) updateData.isOnline = body.isOnline;
-        if (body.imageUrl !== undefined) updateData.imageUrl = body.imageUrl;
-        if (body.capacity !== undefined) updateData.capacity = body.capacity;
-        if (body.price !== undefined) updateData.price = body.price;
+        if (!parsed.success) {
+            return NextResponse.json(
+                {
+                    success: false,
+                    errors: parsed.error.flatten().fieldErrors,
+                },
+                { status: 400 }
+            );
+        }
 
-        if (body.startDate !== undefined)
-            updateData.startDate = new Date(body.startDate);
+        const data = parsed.data;
 
-        if (body.endDate !== undefined)
-            updateData.endDate = new Date(body.endDate);
 
-        updateData.updatedAt = new Date();
-
-        if (Object.keys(updateData).length === 0) {
+        if (Object.keys(data).length === 0) {
             return NextResponse.json(
                 { error: "No fields provided to update" },
                 { status: 400 }
             );
         }
+
+
+        const updateData: Partial<typeof eventsTable.$inferInsert> = {
+            ...data,
+            startDate: data.startDate ? new Date(data.startDate) : undefined,
+            endDate: data.endDate ? new Date(data.endDate) : undefined,
+            price: data.price !== undefined ? String(data.price) : undefined,
+            updatedAt: new Date(),
+        };
 
         const existing = await db
             .select()
@@ -109,7 +130,7 @@ export async function PATCH(
     } catch (error) {
         console.error("Error updating event:", error);
         return NextResponse.json(
-            { error: "Internal Server Error" },
+            { success: false, message: "Internal Server Error", error },
             { status: 500 }
         );
     }

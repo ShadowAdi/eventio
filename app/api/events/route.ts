@@ -1,5 +1,6 @@
 import { db } from "@/config/db";
 import { eventsTable } from "@/db/schema";
+import { createEventSchema } from "@/validators/create-event.validator";
 import { NextRequest, NextResponse } from "next/server";
 
 export async function GET() {
@@ -11,7 +12,7 @@ export async function GET() {
         }, { status: 200 });
     } catch (error) {
         console.error("Error to fetch data :", error);
-        return NextResponse.json({ message: "Error Server" }, { status: 500 });
+        return NextResponse.json({ success: false, message: "Error Server", error }, { status: 500 });
     }
 }
 
@@ -19,37 +20,29 @@ export async function POST(req: NextRequest) {
     try {
         const body = await req.json();
 
-        const {
-            title,
-            description,
-            location,
-            isOnline = false,
-            imageUrl,
-            startDate,
-            endDate,
-            capacity,
-            price,
-        } = body;
+        const parsed = createEventSchema.safeParse(body);
 
-        if (!title || !description || !startDate || !endDate) {
+        if (!parsed.success) {
             return NextResponse.json(
-                { success: false, message: "Missing required fields" },
+                {
+                    success: false,
+                    errors: parsed.error.flatten().fieldErrors,
+                },
                 { status: 400 }
             );
         }
 
+
+        const data = parsed.data;
+
+
         const [event] = await db
             .insert(eventsTable)
             .values({
-                title,
-                description,
-                location,
-                isOnline,
-                imageUrl,
-                startDate: new Date(startDate),
-                endDate: new Date(endDate),
-                capacity,
-                price,
+                ...data,
+                startDate: new Date(data.startDate),
+                endDate: new Date(data.endDate),
+                price: data.price !== undefined ? String(data.price) : undefined,
             })
             .returning();
 
@@ -63,7 +56,7 @@ export async function POST(req: NextRequest) {
     } catch (error) {
         console.error("Error creating event:", error);
         return NextResponse.json(
-            { success: false, message: "Internal Server Error" },
+            { success: false, message: "Internal Server Error", error },
             { status: 500 }
         );
     }

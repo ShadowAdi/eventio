@@ -13,10 +13,32 @@ export type EventResponse = {
 };
 
 
+export type CreateEventInput = {
+  title: string;
+  description: string;
+  location: string | null;
+  isOnline: boolean;
+  startDate: string;
+  endDate: string;
+  capacity: number | null;
+  price: string;
+};
+
+export type UpdateEventInput = {
+  title?: string;
+  description?: string;
+  location?: string;
+  isOnline?: boolean;
+  startDate?: string;
+  endDate?: string;
+  capacity?: number;
+  price?: string;
+};
+
+
 export type ApiResponse<T> = {
   data: T;
   success:boolean;
-  error: null | {
-    message: string;
-  };
+  message:string;
+  error: unknown;
 };

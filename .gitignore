@@ -15,6 +15,7 @@
 
 /coverage
 
+/drizzle
 # next.js
 /.next/
 /out/

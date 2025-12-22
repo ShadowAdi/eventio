@@ -1,15 +1,16 @@
 import {
-  mysqlTable,
-  int,
+  pgTable,
+  serial,
   varchar,
   text,
-  datetime,
+  timestamp,
   boolean,
-  decimal,
-} from "drizzle-orm/mysql-core";
+  numeric,
+  integer,
+} from "drizzle-orm/pg-core";
 
-export const events = mysqlTable("events", {
-  id: int("id").primaryKey().autoincrement(),
+export const eventsTable = pgTable("events", {
+  id: serial("id").primaryKey(),
 
   title: varchar("title", { length: 255 }).notNull(),
 
@@ -20,19 +21,20 @@ export const events = mysqlTable("events", {
   isOnline: boolean("is_online").notNull().default(false),
 
   imageUrl: varchar("image_url", { length: 512 }),
-  
-  startDate: datetime("start_date").notNull(),
 
-  endDate: datetime("end_date").notNull(),
+  startDate: timestamp("start_date", { withTimezone: true }).notNull(),
 
-  capacity: int("capacity"),
+  endDate: timestamp("end_date", { withTimezone: true }).notNull(),
 
-  price: decimal("price", { precision: 10, scale: 2 }).default("0.00"),
+  capacity: integer("capacity"),
 
-  createdAt: datetime("created_at").notNull().$defaultFn(() => new Date()),
+  price: numeric("price", { precision: 10, scale: 2 }).default("0.00"),
 
-  updatedAt: datetime("updated_at")
+  createdAt: timestamp("created_at", { withTimezone: true })
     .notNull()
-    .$defaultFn(() => new Date())
-    .$onUpdateFn(() => new Date()),
+    .defaultNow(),
+
+  updatedAt: timestamp("updated_at", { withTimezone: true })
+    .notNull()
+    .defaultNow(),
 });

@@ -14,3 +14,57 @@ export async function GET() {
         return NextResponse.json({ message: "Error Server" }, { status: 500 });
     }
 }
+
+export async function POST(req: Request) {
+    try {
+        const body = await req.json();
+
+        const {
+            title,
+            description,
+            location,
+            isOnline = false,
+            imageUrl,
+            startDate,
+            endDate,
+            capacity,
+            price,
+        } = body;
+
+        if (!title || !description || !startDate || !endDate) {
+            return NextResponse.json(
+                { success: false, message: "Missing required fields" },
+                { status: 400 }
+            );
+        }
+        
+        const [event] = await db
+            .insert(eventsTable)
+            .values({
+                title,
+                description,
+                location,
+                isOnline,
+                imageUrl,
+                startDate: new Date(startDate),
+                endDate: new Date(endDate),
+                capacity,
+                price,
+            })
+            .returning();
+
+        return NextResponse.json(
+            {
+                success: true,
+                event,
+            },
+            { status: 201 }
+        );
+    } catch (error) {
+        console.error("Error creating event:", error);
+        return NextResponse.json(
+            { success: false, message: "Internal Server Error" },
+            { status: 500 }
+        );
+    }
+}

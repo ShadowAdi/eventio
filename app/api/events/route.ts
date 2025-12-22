@@ -1,6 +1,6 @@
 import { db } from "@/config/db";
 import { eventsTable } from "@/db/schema";
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 
 export async function GET() {
     try {
@@ -15,7 +15,7 @@ export async function GET() {
     }
 }
 
-export async function POST(req: Request) {
+export async function POST(req: NextRequest) {
     try {
         const body = await req.json();
 
@@ -37,7 +37,7 @@ export async function POST(req: Request) {
                 { status: 400 }
             );
         }
-        
+
         const [event] = await db
             .insert(eventsTable)
             .values({

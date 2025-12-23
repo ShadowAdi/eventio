@@ -20,7 +20,7 @@ const EventCard = ({ event, index }: { event: EventResponse, index: number }) =>
         router.push(`/${event.id}`)
       }}
     >
-      <Card className="h-full border-zinc-200 bg-white transition-shadow hover:shadow-lg dark:border-zinc-800 dark:bg-zinc-900">
+      <Card className="h-full border-zinc-200 bg-white transition-shadow hover:shadow-lg dark:border-zinc-800 dark:bg-zinc-900 cursor-pointer!">
         <CardHeader>
           <div className="mb-2 flex items-start justify-between gap-2">
             <CardTitle className="text-xl text-zinc-900 dark:text-zinc-50">
@@ -36,7 +36,7 @@ const EventCard = ({ event, index }: { event: EventResponse, index: number }) =>
             )}
           </div>
           <CardDescription className="text-zinc-600 dark:text-zinc-400">
-            {event.description}
+            {event.description.substring(0,100)}
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-3">

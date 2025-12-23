@@ -130,7 +130,7 @@ export default function EventEditFormPage() {
                 >
                     <Button onClick={() => {
                         router.push(`/`)
-                    }} variant="ghost" className="gap-2 text-zinc-600 hover:text-lime-500 dark:text-zinc-400">
+                    }} variant="ghost" className="gap-2 text-zinc-600 hover:text-lime-500 dark:text-zinc-400 cursor-pointer! ">
                         <ArrowLeft className="h-4 w-4" />
                         Back to Events
                     </Button>
@@ -413,7 +413,7 @@ export default function EventEditFormPage() {
                                         <Button
                                             onClick={form.handleSubmit(onSubmit)}
                                             disabled={isSubmitting}
-                                            className="flex-1 bg-lime-500 text-black hover:bg-lime-600 font-semibold"
+                                            className="flex-1 bg-lime-500  text-white cursor-pointer! hover:bg-lime-600 font-semibold"
                                         >
                                             {isSubmitting ? (
                                                 <>
@@ -427,7 +427,7 @@ export default function EventEditFormPage() {
                                         <Button
                                             type="button"
                                             variant="outline"
-                                            className="border-zinc-300 dark:border-zinc-700"
+                                            className="border-zinc-300 text-black cursor-pointer! dark:border-zinc-700"
                                         >
                                             Cancel
                                         </Button>

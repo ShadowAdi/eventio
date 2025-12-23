@@ -1,6 +1,6 @@
 'use client'
 import { motion } from 'framer-motion';
-import { MapPin, Calendar, Users, Clock, Globe, ArrowLeft, Share2 } from 'lucide-react';
+import { MapPin, Calendar, Users, Clock, Globe, ArrowLeft, Share2, Edit } from 'lucide-react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -79,7 +79,7 @@ export default function SingleEventPage() {
                         onClick={() => {
                             router.push(`/`)
                         }}
-                        variant="ghost" className="gap-2 text-zinc-600 hover:text-lime-500 dark:text-zinc-400">
+                        variant="ghost" className="gap-2 text-zinc-600 cursor-pointer! hover:text-lime-500 dark:text-zinc-400">
                         <ArrowLeft className="h-4 w-4" />
                         Back to Events
                     </Button>
@@ -198,6 +198,12 @@ export default function SingleEventPage() {
                                         }} variant="outline" className="w-full gap-2 border-zinc-300 dark:border-zinc-700 cursor-pointer!">
                                             <Share2 className="h-4 w-4" />
                                             Share Event
+                                        </Button>
+                                        <Button onClick={() => {
+                                            router.push(`/${eventId}/edit`)
+                                        }} variant="outline" className="w-full gap-2 border-zinc-300 dark:border-zinc-700 cursor-pointer!">
+                                            <Edit className="h-4 w-4" />
+                                            Update Event
                                         </Button>
                                         <Button
                                             variant="destructive"

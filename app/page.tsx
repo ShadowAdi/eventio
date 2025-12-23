@@ -7,62 +7,14 @@ import EventCard from '@/components/globals/events/EventCard';
 import EventsErrorHandler from '@/components/globals/events/EventsErrorHandler';
 import EventLoadingComponent from '@/components/globals/events/EventLoadingComponent';
 import { useEvents } from '@/events/hooks';
+import { Button } from '@/components/ui/button';
+import { useRouter } from 'next/navigation';
 
-// const useEvents = () => {
-//   const [isLoading] = useState(false);
-//   const [error] = useState(null);
-
-//   const data = {
-//     success: true,
-//     events: [
-//       {
-//         id: 1,
-//         title: "Tech Conference 2024",
-//         description: "Join us for the biggest tech conference of the year featuring keynotes from industry leaders.",
-//         location: "San Francisco, CA",
-//         isOnline: false,
-//         startDate: "2024-03-15T09:00:00Z",
-//         endDate: "2024-03-17T18:00:00Z",
-//         capacity: 500,
-//         price: "299.00",
-//         createdAt: "2024-01-10T10:00:00Z",
-//         updatedAt: "2024-01-15T14:30:00Z"
-//       },
-//       {
-//         id: 2,
-//         title: "Virtual Workshop: React Best Practices",
-//         description: "Learn advanced React patterns and best practices from experienced developers.",
-//         location: null,
-//         isOnline: true,
-//         startDate: "2024-03-20T14:00:00Z",
-//         endDate: "2024-03-20T17:00:00Z",
-//         capacity: 100,
-//         price: "49.00",
-//         createdAt: "2024-01-12T10:00:00Z",
-//         updatedAt: "2024-01-18T09:15:00Z"
-//       },
-//       {
-//         id: 3,
-//         title: "Community Meetup",
-//         description: "Connect with local developers and share experiences over coffee and snacks.",
-//         location: "New York, NY",
-//         isOnline: false,
-//         startDate: "2024-03-25T18:00:00Z",
-//         endDate: "2024-03-25T21:00:00Z",
-//         capacity: 50,
-//         price: "0.00",
-//         createdAt: "2024-01-14T11:00:00Z",
-//         updatedAt: "2024-01-20T16:45:00Z"
-//       }
-//     ]
-//   };
-
-//   return { data, isLoading, error };
-// };
 
 export default function Home() {
   const { data, isLoading, error } = useEvents();
   const [searchQuery, setSearchQuery] = useState('');
+  const router = useRouter()
 
   const filteredEvents = data?.events.filter(event =>
     event.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -97,9 +49,14 @@ export default function Home() {
           <p className="text-lg text-zinc-600 dark:text-zinc-400">
             Discover and join amazing events
           </p>
+          <Button onClick={() => {
+            router.push("/create")
+          }} className='bg-lime-600 hover:bg-lime-700 mt-3 text-white cursor-pointer! px-5 py-4 rounded-md'>
+            Create Event
+          </Button>
         </motion.div>
 
-        <motion.div
+        {filteredEvents.length !== 0 && <motion.div
           initial={{ opacity: 0, y: -10 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.1 }}
@@ -115,7 +72,7 @@ export default function Home() {
               className="pl-10 h-12 border-zinc-300 focus-visible:ring-lime-500 dark:border-zinc-700"
             />
           </div>
-        </motion.div>
+        </motion.div>}
 
         <AnimatePresence mode="wait">
           {filteredEvents.length === 0 ? (

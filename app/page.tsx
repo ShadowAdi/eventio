@@ -1,11 +1,11 @@
 'use client'
 import { SetStateAction, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Search, MapPin, Calendar, Users, DollarSign, Loader2, AlertCircle, Globe } from 'lucide-react';
-import { Alert, AlertDescription } from '@/components/ui/alert';
+import { Search } from 'lucide-react';
 import { Input } from '@/components/ui/input';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
+import EventCard from '@/components/globals/events/EventCard';
+import EventsErrorHandler from '@/components/globals/events/EventsErrorHandler';
+import EventLoadingComponent from '@/components/globals/events/EventLoadingComponent';
 
 const useEvents = () => {
   const [isLoading] = useState(false);
@@ -69,48 +69,16 @@ export default function Home() {
     (event.location && event.location.toLowerCase().includes(searchQuery.toLowerCase()))
   ) || [];
 
-  const formatDate = (dateString: string) => {
-    const date = new Date(dateString);
-    return date.toLocaleDateString('en-US', {
-      month: 'short',
-      day: 'numeric',
-      year: 'numeric',
-      hour: '2-digit',
-      minute: '2-digit'
-    });
-  };
 
   if (isLoading) {
     return (
-      <div className="flex min-h-screen items-center justify-center bg-zinc-50 dark:bg-zinc-950">
-        <motion.div
-          initial={{ opacity: 0, scale: 0.9 }}
-          animate={{ opacity: 1, scale: 1 }}
-          className="flex flex-col items-center gap-4"
-        >
-          <Loader2 className="h-12 w-12 animate-spin text-lime-500" />
-          <p className="text-lg text-zinc-600 dark:text-zinc-400">Loading events...</p>
-        </motion.div>
-      </div>
+      <EventLoadingComponent />
     );
   }
 
   if (error) {
     return (
-      <div className="flex min-h-screen items-center justify-center bg-zinc-50 p-4 dark:bg-zinc-950">
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="w-full max-w-md"
-        >
-          <Alert variant="destructive" className="border-red-200 bg-red-50 dark:border-red-900 dark:bg-red-950">
-            <AlertCircle className="h-5 w-5" />
-            <AlertDescription className="ml-2">
-              Failed to load events. Please try again later.
-            </AlertDescription>
-          </Alert>
-        </motion.div>
-      </div>
+      <EventsErrorHandler error={error} />
     );
   }
 
@@ -170,61 +138,7 @@ export default function Home() {
               className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3"
             >
               {filteredEvents.map((event, index) => (
-                <motion.div
-                  key={event.id}
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: index * 0.1 }}
-                  whileHover={{ y: -5 }}
-                >
-                  <Card className="h-full border-zinc-200 bg-white transition-shadow hover:shadow-lg dark:border-zinc-800 dark:bg-zinc-900">
-                    <CardHeader>
-                      <div className="mb-2 flex items-start justify-between gap-2">
-                        <CardTitle className="text-xl text-zinc-900 dark:text-zinc-50">
-                          {event.title}
-                        </CardTitle>
-                        {event.isOnline ? (
-                          <Badge className="bg-lime-500 text-black hover:bg-lime-600">
-                            <Globe className="mr-1 h-3 w-3" />
-                            Online
-                          </Badge>
-                        ) : (
-                          <Badge variant="secondary">In-Person</Badge>
-                        )}
-                      </div>
-                      <CardDescription className="text-zinc-600 dark:text-zinc-400">
-                        {event.description}
-                      </CardDescription>
-                    </CardHeader>
-                    <CardContent className="space-y-3">
-                      <div className="flex items-center gap-2 text-sm text-zinc-600 dark:text-zinc-400">
-                        <Calendar className="h-4 w-4 text-lime-500" />
-                        <span>{formatDate(event.startDate)}</span>
-                      </div>
-
-                      {event.location && (
-                        <div className="flex items-center gap-2 text-sm text-zinc-600 dark:text-zinc-400">
-                          <MapPin className="h-4 w-4 text-lime-500" />
-                          <span>{event.location}</span>
-                        </div>
-                      )}
-
-                      {event.capacity && (
-                        <div className="flex items-center gap-2 text-sm text-zinc-600 dark:text-zinc-400">
-                          <Users className="h-4 w-4 text-lime-500" />
-                          <span>{event.capacity} spots</span>
-                        </div>
-                      )}
-
-                      <div className="flex items-center gap-2 pt-2">
-                        <DollarSign className="h-4 w-4 text-lime-500" />
-                        <span className="text-lg font-semibold text-zinc-900 dark:text-zinc-50">
-                          {parseFloat(event.price) === 0 ? 'Free' : `$${event.price}`}
-                        </span>
-                      </div>
-                    </CardContent>
-                  </Card>
-                </motion.div>
+                <EventCard event={event} index={index} key={index} />
               ))}
             </motion.div>
           )}

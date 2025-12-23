@@ -1,4 +1,4 @@
-import { ApiResponse,  EventResponse } from "@/types/Event.types";
+import { ApiResponse, EventResponse } from "@/types/Event.types";
 import { apiClient } from "./apiClient";
 import { CreateEventInput, UpdateEventInput } from "@/validators/event.validator";
 
@@ -20,7 +20,7 @@ export const updateEvent = (id: number, data: UpdateEventInput) =>
         body: JSON.stringify(data),
     });
 
-export const deleteEvent = (id: number) =>
-    apiClient<{ success: boolean; message: string }>(`/api/events/${id}`, {
+export const deleteEvent = async (id: number) =>
+    apiClient<void>(`/api/events/${id}`, {
         method: "DELETE",
     });

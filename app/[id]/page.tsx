@@ -8,35 +8,64 @@ import { formatDate } from '@/utils/format-date';
 import { formatTime } from '@/utils/formatTime';
 import Image from 'next/image';
 import { toast } from 'sonner';
-import { deleteEvent } from '@/utils/api';
-import { useRouter } from 'next/navigation';
+import { deleteEvent, getEventById } from '@/utils/api';
+import { useParams, useRouter } from 'next/navigation';
+import { useEffect, useState } from 'react';
+import { EventResponse } from '@/types/Event.types';
 
-const currentEvent = {
-    id: 1,
-    title: "Tech Conference 2024",
-    description: "Join us for the biggest tech conference of the year featuring keynotes from industry leaders, hands-on workshops, and networking opportunities. This three-day event will cover the latest trends in AI, cloud computing, cybersecurity, and web development. Don't miss out on this opportunity to connect with innovators and learn from the best in the industry.",
-    location: "San Francisco Convention Center, CA",
-    isOnline: false,
-    startDate: "2024-03-15T09:00:00Z",
-    endDate: "2024-03-17T18:00:00Z",
-    imageUrl: "https://images.unsplash.com/photo-1540575467063-178a50c2df87?w=1200&h=600&fit=crop",
-    capacity: 500,
-    price: "299.00",
-    createdAt: "2024-01-10T10:00:00Z",
-    updatedAt: "2024-01-15T14:30:00Z"
-};
 
 
 export default function SingleEventPage() {
-    const event = currentEvent;
+    const params = useParams();
+    const { id: eventId } = params;
+    const [event, setEvent] = useState<EventResponse | null>(null);
+    const [loading, setLoading] = useState(true);
     const router = useRouter()
 
+
+    useEffect(() => {
+        if (!eventId) return;
+
+        const fetchEvent = async () => {
+            try {
+                const res = await getEventById(Number(eventId));
+                setEvent(res.event);
+            } catch (error) {
+                const message =
+                    error instanceof Error ? error.message : "Event not found";
+
+                toast.error(message);
+                router.replace("/");
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        fetchEvent();
+    }, [eventId, router]);
+
+
+
     const calculateDuration = () => {
-        const start = new Date(event.startDate);
-        const end = new Date(event.endDate);
-        const days = Math.ceil((end.getTime() - start.getTime()) / (1000 * 60 * 60 * 24));
-        return days > 1 ? `${days} days` : 'Single day';
+        if (event) {
+            const start = new Date(event.startDate);
+            const end = new Date(event.endDate);
+            const days = Math.ceil((end.getTime() - start.getTime()) / (1000 * 60 * 60 * 24));
+            return days > 1 ? `${days} days` : 'Single day';
+        }
     };
+
+    if (loading) {
+        return (
+            <div className="min-h-screen flex items-center justify-center">
+                <p className="text-zinc-500">Loading event...</p>
+            </div>
+        );
+    }
+
+    if (!event) {
+        return null;
+    }
 
     return (
         <div className="min-h-screen bg-zinc-50 dark:bg-zinc-950">
@@ -62,7 +91,7 @@ export default function SingleEventPage() {
                     transition={{ delay: 0.1 }}
                 >
                     <Card className="overflow-hidden border-zinc-200 bg-white dark:border-zinc-800 dark:bg-zinc-900">
-                        <div className="relative h-64 sm:h-96 overflow-hidden">
+                        {event.imageUrl && <div className="relative h-64 sm:h-96 overflow-hidden">
                             <Image
                                 src={event.imageUrl}
                                 alt={event.title}
@@ -88,7 +117,7 @@ export default function SingleEventPage() {
                                     {event.title}
                                 </h1>
                             </div>
-                        </div>
+                        </div>}
 
                         <div className="grid gap-8 p-6 sm:p-8 lg:grid-cols-3">
                             <div className="lg:col-span-2 space-y-6">
@@ -135,7 +164,7 @@ export default function SingleEventPage() {
                                         <div className="flex items-center justify-between">
                                             <span className="text-sm text-zinc-600 dark:text-zinc-400">Price</span>
                                             <span className="text-2xl font-bold text-zinc-900 dark:text-zinc-50">
-                                                {parseFloat(event.price) === 0 ? 'Free' : `$${event.price}`}
+                                                {event.price === 0 ? 'Free' : `$${event.price}`}
                                             </span>
                                         </div>
 
@@ -170,24 +199,32 @@ export default function SingleEventPage() {
                                             <Share2 className="h-4 w-4" />
                                             Share Event
                                         </Button>
-                                        <Button onClick={() => {
-                                            deleteEvent(event.id)
-                                            setTimeout(() => {
-                                                toast.success("Event Deleted")
-                                                router.push("/")
-                                            }, 1500);
-                                        }} variant="destructive" className="w-full gap-2  cursor-pointer! text-white">
-                                            <Share2 className="h-4 w-4" />
+                                        <Button
+                                            variant="destructive"
+                                            className="w-full gap-2 text-white cursor-pointer!"
+                                            onClick={async () => {
+                                                try {
+                                                    await deleteEvent(event.id);
+
+                                                    toast.success("Event deleted successfully");
+                                                    router.push("/");
+                                                } catch (error) {
+                                                    toast.error(
+                                                        error instanceof Error ? error.message : "Failed to delete event"
+                                                    );
+                                                }
+                                            }}
+                                        >
                                             Delete Event
                                         </Button>
+
+
                                     </CardContent>
                                 </Card>
                             </div>
                         </div>
                     </Card>
                 </motion.div>
-
-
             </div>
         </div>
     );

@@ -1,5 +1,8 @@
+
+
 type ApiError = {
-  message: string;
+  message?: string;
+  error?: string;
 };
 
 export async function apiClient<T>(
@@ -17,14 +20,17 @@ export async function apiClient<T>(
     let message = "Something went wrong";
 
     try {
-      const error = await res.json();
-      message = error.message || JSON.stringify(error);
-      console.error("API Error:", error);
+      const error: ApiError = await res.json();
+      message = error.message || error.error || message;
     } catch {
-      console.error("API Error (non-JSON response)");
+      // non-json error
     }
 
     throw new Error(message);
+  }
+
+  if (res.status === 204) {
+    return {} as T;
   }
 
   return res.json() as Promise<T>;

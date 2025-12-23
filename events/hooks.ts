@@ -1,5 +1,5 @@
-import { CreateEventInput, UpdateEventInput } from "@/types/Event.types";
 import { createEvent, deleteEvent, getEventById, getEvents, updateEvent } from "@/utils/api";
+import { CreateEventInput, UpdateEventInput } from "@/validators/event.validator";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
 export const useEvents = () => useQuery({

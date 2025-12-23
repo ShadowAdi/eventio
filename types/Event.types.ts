@@ -8,34 +8,9 @@ export type EventResponse = {
   endDate: string;
   imageUrl?:string;
   capacity: number | null;
-  price: string;
+  price: number;
   createdAt: string;
   updatedAt: string;
-};
-
-
-export type CreateEventInput = {
-  title: string;
-  description: string;
-  location: string | null;
-  isOnline: boolean;
-  startDate: string;
-  imageUrl?:string;
-  endDate: string;
-  capacity: number | null;
-  price: string;
-};
-
-export type UpdateEventInput = {
-  title?: string;
-  description?: string;
-  location?: string;
-  isOnline?: boolean;
-  imageUrl?:string;
-  startDate?: string;
-  endDate?: string;
-  capacity?: number;
-  price?: string;
 };
 
 

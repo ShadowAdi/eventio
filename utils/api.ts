@@ -1,5 +1,6 @@
-import { ApiResponse, CreateEventInput, EventResponse, UpdateEventInput } from "@/types/Event.types";
+import { ApiResponse,  EventResponse } from "@/types/Event.types";
 import { apiClient } from "./apiClient";
+import { CreateEventInput, UpdateEventInput } from "@/validators/event.validator";
 
 export const getEvents = () =>
     apiClient<{ success: boolean; events: EventResponse[] }>("/api/events")

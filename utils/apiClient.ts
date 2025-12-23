@@ -14,8 +14,17 @@ export async function apiClient<T>(
   });
 
   if (!res.ok) {
-    const error = (await res.json()) as ApiError;
-    throw new Error(error.message ?? "Something went wrong");
+    let message = "Something went wrong";
+
+    try {
+      const error = await res.json();
+      message = error.message || JSON.stringify(error);
+      console.error("API Error:", error);
+    } catch {
+      console.error("API Error (non-JSON response)");
+    }
+
+    throw new Error(message);
   }
 
   return res.json() as Promise<T>;

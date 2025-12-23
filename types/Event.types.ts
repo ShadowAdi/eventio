@@ -6,6 +6,7 @@ export type EventResponse = {
   isOnline: boolean;
   startDate: string;
   endDate: string;
+  imageUrl?:string;
   capacity: number | null;
   price: string;
   createdAt: string;
@@ -19,6 +20,7 @@ export type CreateEventInput = {
   location: string | null;
   isOnline: boolean;
   startDate: string;
+  imageUrl?:string;
   endDate: string;
   capacity: number | null;
   price: string;
@@ -29,6 +31,7 @@ export type UpdateEventInput = {
   description?: string;
   location?: string;
   isOnline?: boolean;
+  imageUrl?:string;
   startDate?: string;
   endDate?: string;
   capacity?: number;

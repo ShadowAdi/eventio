@@ -29,21 +29,8 @@ import { useRouter } from 'next/navigation';
 
 
 
-const existingEvent = {
-    id: 1,
-    title: "Tech Conference 2024",
-    description: "Join us for the biggest tech conference of the year featuring keynotes from industry leaders.",
-    location: "San Francisco Convention Center, CA",
-    isOnline: false,
-    startDate: "2024-03-15T09:00",
-    endDate: "2024-03-17T18:00",
-    imageUrl: "https://images.unsplash.com/photo-1540575467063-178a50c2df87?w=1200&h=600&fit=crop",
-    capacity: 500,
-    price: 299,
-};
 
-export default function EventFormPage({ mode = 'create', eventId = null }) {
-    const isEditMode = mode === 'edit';
+export default function EventFormPage() {
 
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [submitSuccess, setSubmitSuccess] = useState(false);
@@ -69,14 +56,6 @@ export default function EventFormPage({ mode = 'create', eventId = null }) {
     const watchImageUrl = form.watch('imageUrl');
     const watchIsOnline = form.watch('isOnline');
 
-    // Load existing event data in edit mode
-    useEffect(() => {
-        if (isEditMode && eventId) {
-            setTimeout(() => {
-                form.reset(eventToFormValues(existingEvent));
-            }, 500);
-        }
-    }, [isEditMode, eventId, form]);
 
     useEffect(() => {
         setImagePreviewLoaded(false);
@@ -148,10 +127,10 @@ export default function EventFormPage({ mode = 'create', eventId = null }) {
                     className="mb-8"
                 >
                     <h1 className="text-3xl font-bold text-zinc-900 dark:text-zinc-50 mb-2">
-                        {isEditMode ? 'Edit Event' : 'Create New Event'}
+                        {'Create New Event'}
                     </h1>
                     <p className="text-zinc-600 dark:text-zinc-400">
-                        {isEditMode ? 'Update your event details below' : 'Fill in the details to create a new event'}
+                        {'Fill in the details to create a new event'}
                     </p>
                 </motion.div>
 
@@ -164,7 +143,7 @@ export default function EventFormPage({ mode = 'create', eventId = null }) {
                         <Alert className="border-lime-500 bg-lime-50 dark:bg-lime-950/20">
                             <Check className="h-5 w-5 text-lime-600" />
                             <AlertDescription className="ml-2 text-lime-800 dark:text-lime-400">
-                                Event {isEditMode ? 'updated' : 'created'} successfully!
+                                Event {'created'} successfully!
                             </AlertDescription>
                         </Alert>
                     </motion.div>
@@ -424,10 +403,10 @@ export default function EventFormPage({ mode = 'create', eventId = null }) {
                                             {isSubmitting ? (
                                                 <>
                                                     <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                                                    {isEditMode ? 'Updating...' : 'Creating...'}
+                                                    {'Creating...'}
                                                 </>
                                             ) : (
-                                                <>{isEditMode ? 'Update Event' : 'Create Event'}</>
+                                                <>{'Create Event'}</>
                                             )}
                                         </Button>
                                         <Button

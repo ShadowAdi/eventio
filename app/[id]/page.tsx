@@ -46,7 +46,11 @@ export default function SingleEventPage() {
                     animate={{ opacity: 1, x: 0 }}
                     className="mb-6"
                 >
-                    <Button variant="ghost" className="gap-2 text-zinc-600 hover:text-lime-500 dark:text-zinc-400">
+                    <Button
+                        onClick={() => {
+                            router.push(`/`)
+                        }}
+                        variant="ghost" className="gap-2 text-zinc-600 hover:text-lime-500 dark:text-zinc-400">
                         <ArrowLeft className="h-4 w-4" />
                         Back to Events
                     </Button>
@@ -167,7 +171,7 @@ export default function SingleEventPage() {
                                             Share Event
                                         </Button>
                                         <Button onClick={() => {
-                                            // deleteEvent(event.id)
+                                            deleteEvent(event.id)
                                             setTimeout(() => {
                                                 toast.success("Event Deleted")
                                                 router.push("/")

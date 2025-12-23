@@ -22,7 +22,7 @@ import {
 } from '@/components/ui/form';
 import Image from 'next/image';
 import { eventSchema } from '@/validators/event-form.validator';
-import {  getEventById, updateEvent } from '@/utils/api';
+import { getEventById, updateEvent } from '@/utils/api';
 import { eventToFormValues } from '@/helper/helper';
 import { toast } from 'sonner';
 import { useParams, useRouter } from 'next/navigation';
@@ -91,7 +91,7 @@ export default function EventEditFormPage() {
             toast.success(
                 "Event Updated"
             );
-            router.push("/")
+            router.push(`/${eventId}`)
             setSubmitSuccess(true);
         } catch (error) {
             const message =
@@ -128,7 +128,9 @@ export default function EventEditFormPage() {
                     animate={{ opacity: 1, x: 0 }}
                     className="mb-6"
                 >
-                    <Button variant="ghost" className="gap-2 text-zinc-600 hover:text-lime-500 dark:text-zinc-400">
+                    <Button onClick={() => {
+                        router.push(`/`)
+                    }} variant="ghost" className="gap-2 text-zinc-600 hover:text-lime-500 dark:text-zinc-400">
                         <ArrowLeft className="h-4 w-4" />
                         Back to Events
                     </Button>
